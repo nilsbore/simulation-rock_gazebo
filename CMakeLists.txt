@@ -1,6 +1,10 @@
 # CMakeLists.txt has to be located in the project folder and cmake has to be
 # executed from 'project/build' with 'cmake ../'.
 cmake_minimum_required(VERSION 2.6)
+project(rock_gazebo)
+
+SET(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/base-cmake/modules)
+
 find_package(Rock)
 rock_init(rock_gazebo 0.1)
 
