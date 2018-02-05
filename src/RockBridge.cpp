@@ -113,6 +113,80 @@ void RockBridge::Load(int _argc , char** _argv)
     eventHandler.push_back(
             event::Events::ConnectWorldCreated(
                 boost::bind(&RockBridge::worldCreated,this, _1)));
+    eventHandler.push_back(
+            event::Events::ConnectAddEntity(
+                boost::bind(&RockBridge::entityCreated,this, _1)));
+}
+
+// worldCreated() is called every time a world is aCreatedvoid RockBridge::entityCreated(string const& entityName)
+void RockBridge::entityCreated(string const& entityName)
+{
+    gzmsg << "RockBridge: added entity: "<< entityName << endl;
+
+    /*if (entityName == "ned" || entityName == "ocean_box") {
+        return;
+	}*/
+
+    physics::WorldPtr world = physics::get_world(this->worldName);
+    if (!world)
+    {
+        gzerr << "RockBridge: cannot find world " << worldName << endl;
+        return;
+    }
+
+	/*
+    typedef physics::Model_V Model_V;
+    Model_V model_list = world->GetModels();
+    for(Model_V::iterator model_it = model_list.begin(); model_it != model_list.end(); ++model_it)
+    {
+        gzmsg << "RockBridge: comparing model: "<< (*model_it)->GetName() << endl;
+		if ((*model_it)->GetName() != entityName) {
+		    continue;
+		}
+        gzmsg << "RockBridge: initializing model: "<< (*model_it)->GetName() << endl;
+        sdf::ElementPtr modelElement = (*model_it)->GetSDF();
+
+        // Create and initialize a component for each gazebo model
+        ModelTask* model_task = new ModelTask();
+        model_task->setGazeboModel(world, (*model_it) );
+        setupTaskActivity(model_task);
+
+        // Create and initialize a component for each model plugin
+        instantiatePluginComponents( modelElement, (*model_it) );
+
+        // Create and initialize a component for each sensor
+        instantiateSensorComponents( modelElement, (*model_it) );
+    }
+    model_list.clear();
+	*/
+
+    gzmsg << "RockBridge: before get model: "<< entityName << endl;
+	//physics::ModelPtr model; // = world->getByName(entityName);
+	//model = model->GetByName(entityName);
+	physics::EntityPtr entity = world->GetEntity(entityName);
+    gzmsg << "RockBridge: while get model: "<< entity->GetScopedName() << endl;
+	entity->Print("  ");
+	
+	//physics::ModelPtr model = world->GetModel(entityName);
+	//physics::ModelPtr model(new physics::Model(entity));
+	physics::ModelPtr model = entity->GetParentModel();
+	model->Print("  ");
+    //gzmsg << "RockBridge: initializing model: "<< model->GetName() << endl;
+    
+	sdf::ElementPtr modelElement = model->GetSDF();
+
+    // Create and initialize a component for each gazebo model
+    ModelTask* model_task = new ModelTask();
+    model_task->setGazeboModel(world, model);
+    setupTaskActivity(model_task);
+
+    // Create and initialize a component for each model plugin
+    instantiatePluginComponents( modelElement, model);
+
+    // Create and initialize a component for each sensor
+    instantiateSensorComponents( modelElement, model);
+
+    gzmsg << "RockBridge: added model: "<< entityName << endl;
 }
 
 // worldCreated() is called every time a world is added
@@ -130,6 +204,7 @@ void RockBridge::worldCreated(string const& worldName)
     tasks.push_back( logger_task );
 
     physics::WorldPtr world = physics::get_world(worldName);
+    //world = physics::get_world(worldName);
     if (!world)
     {
         gzerr << "RockBridge: cannot find world " << worldName << endl;
@@ -140,7 +215,9 @@ void RockBridge::worldCreated(string const& worldName)
     WorldTask* world_task = new WorldTask();
     world_task->setGazeboWorld(world);
     setupTaskActivity(world_task);
+	this->worldName = worldName;
 
+	/*
     typedef physics::Model_V Model_V;
     Model_V model_list = world->GetModels();
     for(Model_V::iterator model_it = model_list.begin(); model_it != model_list.end(); ++model_it)
@@ -160,6 +237,7 @@ void RockBridge::worldCreated(string const& worldName)
         instantiateSensorComponents( modelElement, (*model_it) );
     }
     model_list.clear();
+	*/
 }
 
 void RockBridge::setupTaskActivity(RTT::TaskContext* task)
@@ -225,6 +303,7 @@ void RockBridge::instantiateSensorComponents(sdf::ElementPtr modelElement, Model
             string sensorName = sensorElement->Get<string>("name");
             string sensorType = sensorElement->Get<string>("type");
 
+            gzmsg << "RockGazebo: adding sensor " << sensorName << " of type " << sensorType << endl;
             if (sensorType == "ray")
                 setupSensorTask<LaserScanTask>(model, sensorElement);
             else if(sensorType == "camera")

@@ -35,6 +35,7 @@ namespace rock_gazebo
 
         private:
             void worldCreated(std::string const&);
+            void entityCreated(std::string const&);
             // void modelAdded(std::string const&);
             void updateBegin(gazebo::common::UpdateInfo const& info);
             void setupTaskActivity(RTT::TaskContext* task);
@@ -51,6 +52,8 @@ namespace rock_gazebo
             Tasks tasks;
             typedef std::vector<RTT::base::ActivityInterface*> Activities;
             Activities activities;
+			std::string worldName;
+			//gazebo::physics::WorldPtr world; 
     };
 
     // Register this plugin with the simulator
