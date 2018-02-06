@@ -13,7 +13,11 @@ module RockGazebo
                 env = Vizkit.default_loader.send(env)
             end
             vizkit3d.setEnvironmentPlugin(env)
+            vizkit3d.setEnvironmentPlugin(Vizkit.default_loader.create_plugin(env))
         end
+
+        vis_gui = Vizkit.default_loader.RobotVisualization
+        vis_gui.loadFromFile("/home/nbore/Workspace/catkin_ws/src/smarc_private_auvs/models/lolo_auv/robots/lolo_auv_default.urdf", "urdf")
 
         if start
             models.each do |model, (_, task_proxy)|
