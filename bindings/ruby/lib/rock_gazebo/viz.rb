@@ -65,7 +65,7 @@ module RockGazebo
 
             conf = Transformer::Configuration.new
             conf.load_sdf(scene_path)
-            conf.rename_frames world.name => 'world'
+            #conf.rename_frames world.name => 'world'
             conf.static_transform Eigen::Vector3.Zero, world.name => 'world'
             vizkit3d.apply_transformer_configuration(conf)
 
@@ -92,7 +92,7 @@ module RockGazebo
 
             conf = Transformer::Configuration.new
             conf.load_sdf(scene_path)
-            conf.rename_frames world.name => 'world'
+            #conf.rename_frames world.name => 'world'
             conf.static_transform Eigen::Vector3.Zero, world.name => 'world'
             vizkit3d.apply_transformer_configuration(conf)
         end
